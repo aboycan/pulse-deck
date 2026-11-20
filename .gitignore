@@ -1,0 +1,52 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build output
+build/
+dist/
+*.AppImage
+*.dmg
+*.deb
+*.rpm
+PulseDeck-Setup-*.exe
+appimagetool*
+
+# Downloaded runtimes
+libmpv-2.dll
+*.7z
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Local test media (never commit copyrighted music)
+*.mp3
+*.flac
+*.m4a
+*.ogg
+*.opus
+*.wma
+*.wav
+*.aiff
+
+# Generated when packing release zips
+MANIFEST.sha256
+
+# Shortcuts created by install.py
+*.lnk
+
+# Audio engine downloaded by install scripts
+src/pulsedeck/audio/lib/

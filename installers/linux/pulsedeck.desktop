@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=PulseDeck
+GenericName=Music Player
+Comment=Play your local music with a 10-band equalizer
+Exec=pulsedeck %F
+TryExec=pulsedeck
+Icon=pulsedeck
+Terminal=false
+Categories=AudioVideo;Audio;Player;Qt;
+Keywords=music;audio;player;mp3;flac;playlist;equalizer;
+MimeType=audio/mpeg;audio/mp3;audio/flac;audio/x-flac;audio/wav;audio/x-wav;audio/aac;audio/mp4;audio/x-m4a;audio/ogg;audio/x-vorbis+ogg;audio/opus;audio/x-ms-wma;audio/aiff;audio/x-aiff;audio/x-mpegurl;audio/mpegurl;
+StartupWMClass=PulseDeck
+StartupNotify=true
+X-AppImage-Name=PulseDeck

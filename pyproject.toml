@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pulsedeck"
+version = "0.1.0"
+description = "An open-source, classic-style desktop music player with a real 10-band equalizer."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE", "NOTICE.md", "THIRD_PARTY_LICENSES.md"]
+authors = [{ name = "Madhu Kumar", email = "madhu.a@hotmail.com" }]
+maintainers = [{ name = "Madhu Kumar", email = "madhu.a@hotmail.com" }]
+requires-python = ">=3.11"
+keywords = ["music", "player", "audio", "equalizer", "mpv", "qt"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: X11 Applications :: Qt",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Sound/Audio :: Players",
+]
+dependencies = [
+    # Only the Qt modules PulseDeck uses (Core, Gui, Widgets, Network, DBus). The full "PySide6"
+    # package would add ~450 MB of unused add-ons such as the Chromium-based web engine.
+    "PySide6-Essentials>=6.6,<7",
+    "python-mpv>=1.0.6,<2",
+    "mutagen>=1.47",
+    "Pillow>=10.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-qt>=4.4", "numpy>=1.26", "ruff>=0.5", "mypy>=1.10"]
+build = ["pyinstaller>=6.6"]
+macos = ["pyobjc-framework-MediaPlayer>=10; sys_platform == 'darwin'"]
+
+[project.scripts]
+pulsedeck = "pulsedeck.main:main"
+
+[project.gui-scripts]
+pulsedeck-gui = "pulsedeck.main:main"
+
+[project.urls]
+Homepage = "https://github.com/aboycan/pulse-deck"
+Issues = "https://github.com/aboycan/pulse-deck/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pulsedeck = ["assets/icons/*", "assets/themes/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra"
+markers = ["gui: needs a Qt display (offscreen is fine)"]
+
+[tool.ruff]
+line-length = 125
+target-version = "py311"
+src = ["src", "tests", "scripts"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "I", "UP", "N", "C4", "SIM"]
+ignore = ["SIM105", "SIM108", "SIM112", "B008", "N802", "UP007", "UP042"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["N", "B"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+warn_unused_ignores = false

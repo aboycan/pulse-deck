@@ -1,0 +1,15 @@
+# Store and check out text files with LF line endings on every platform, regardless of
+# each developer's core.autocrlf setting. Python, shell scripts and Linux packaging files
+# need LF; Python and modern Windows editors handle LF fine.
+* text=auto eol=lf
+
+# Windows-only files keep CRLF.
+*.bat text eol=crlf
+installers/windows/*.txt text eol=crlf
+
+# Binary assets
+*.png binary
+*.ico binary
+*.icns binary
+*.dll binary
+*.7z binary

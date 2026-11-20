@@ -1,0 +1,26 @@
+{
+  "format": "pulsedeck-theme",
+  "version": 1,
+  "id": "classic_dark",
+  "name": "Classic Dark",
+  "radius": 3,
+  "colors": {
+    "window": "#16181d",
+    "panel": "#1f2229",
+    "base": "#121418",
+    "alt_base": "#191c22",
+    "text": "#d6dbe4",
+    "muted": "#7f8898",
+    "accent": "#3ad6a0",
+    "accent_text": "#08130f",
+    "border": "#2e323b",
+    "highlight": "#264a3f",
+    "display_bg": "#07110d",
+    "display_text": "#55f0b4",
+    "display_dim": "#2b7a5d",
+    "groove": "#2c3039",
+    "danger": "#e5534b",
+    "button": "#262a32",
+    "button_hover": "#30353f"
+  }
+}

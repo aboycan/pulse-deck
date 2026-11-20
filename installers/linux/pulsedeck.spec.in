@@ -1,0 +1,38 @@
+# RPM spec for PulseDeck; files are pre-staged by scripts/build_linux.py.
+Name:           pulsedeck
+Version:        @VERSION@
+Release:        1
+Summary:        Classic-style desktop music player with a 10-band equalizer
+License:        MIT and LGPL-2.1-or-later and LGPL-3.0-only and GPL-2.0-or-later
+URL:            https://github.com/aboycan/pulse-deck
+AutoReqProv:    no
+Requires:       mesa-libGL, mesa-libEGL, libxkbcommon-x11, fontconfig, dbus-libs, xcb-util-cursor, alsa-lib
+
+%global debug_package %{nil}
+%global __os_install_post %{nil}
+
+%description
+PulseDeck plays local music with gapless playback, a real-time equalizer,
+playlists and a searchable music library.
+
+%install
+cp -a %{_staged}/. %{buildroot}/
+
+%files
+/opt/pulsedeck
+/usr/bin/pulsedeck
+/usr/share/applications/pulsedeck.desktop
+/usr/share/metainfo/io.github.pulsedeck.PulseDeck.metainfo.xml
+/usr/share/icons/hicolor/*/apps/pulsedeck.*
+%doc /usr/share/doc/pulsedeck/README.md
+%license /usr/share/doc/pulsedeck/LICENSE
+%license /usr/share/doc/pulsedeck/NOTICE.md
+%license /usr/share/doc/pulsedeck/THIRD_PARTY_LICENSES.md
+%license /usr/share/doc/pulsedeck/copyright
+%license /usr/share/doc/pulsedeck/licenses
+
+%post
+update-desktop-database -q /usr/share/applications >/dev/null 2>&1 || :
+
+%postun
+update-desktop-database -q /usr/share/applications >/dev/null 2>&1 || :

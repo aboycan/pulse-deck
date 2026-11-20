@@ -1,0 +1,9 @@
+#!/bin/sh
+# AppImage entry point for PulseDeck.
+HERE="$(dirname "$(readlink -f "$0")")"
+export PATH="$HERE/usr/lib/pulsedeck:$PATH"
+# Prefer the desktop's Wayland session, fall back to X11 automatically.
+if [ -z "$QT_QPA_PLATFORM" ] && [ -n "$WAYLAND_DISPLAY" ]; then
+    export QT_QPA_PLATFORM="wayland;xcb"
+fi
+exec "$HERE/usr/lib/pulsedeck/PulseDeck" "$@"

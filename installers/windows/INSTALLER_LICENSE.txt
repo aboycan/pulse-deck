@@ -1,0 +1,52 @@
+PulseDeck - free and open-source desktop music player
+Copyright (c) 2026 Madhu Kumar and PulseDeck contributors
+https://github.com/aboycan/pulse-deck
+
+PulseDeck is free of charge. It has no ads, no accounts, no telemetry and no
+tracking.
+
+PULSEDECK'S OWN CODE - MIT LICENSE
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+BUNDLED THIRD-PARTY COMPONENTS
+
+This installer also contains open-source components that keep their own
+licences:
+
+  Qt 6 / PySide6-Essentials, shiboken6   LGPL-3.0
+  libmpv / FFmpeg (GPL build)           GPL-2.0-or-later
+  Mutagen                               GPL-2.0-or-later
+  python-mpv                            LGPL-2.1-or-later
+  Pillow                                MIT-CMU
+  CPython                               PSF-2.0
+
+Because it includes GPL-licensed components, this installer as a whole is
+distributed under the GNU General Public License, version 3 or later. You
+may use PulseDeck freely for any purpose. If you redistribute this installer,
+you must also make the corresponding source code available; it is published
+at https://github.com/aboycan/pulse-deck, and the third-party sources are
+available from their upstream projects.
+
+Full licence texts are installed in the "licenses" folder inside the
+PulseDeck installation directory. See NOTICE.md and THIRD_PARTY_LICENSES.md
+in the same place.
+
+PulseDeck is an independent project and is not affiliated with Winamp or its
+owners.

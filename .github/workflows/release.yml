@@ -1,0 +1,165 @@
+name: Release
+
+# Builds installers for every platform on native runners. Tag a commit with
+# "v<version>" (matching src/pulsedeck/__init__.py) to publish a release;
+# run manually to just build artifacts.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  windows:
+    name: Windows ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x64, runner: windows-latest, mpvarch: x86_64, experimental: false }
+          - { arch: arm64, runner: windows-11-arm, mpvarch: aarch64, experimental: true }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Fetch libmpv
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python scripts/fetch_libmpv.py --yes --arch ${{ matrix.mpvarch }}
+      - name: Install Inno Setup
+        run: choco install innosetup -y --no-progress
+      - name: Build
+        run: |
+          pip install -e ".[build]"
+          python scripts/build_windows.py --arch ${{ matrix.arch }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-${{ matrix.arch }}
+          path: dist/PulseDeck-Setup-*.exe
+
+  macos:
+    name: macOS ${{ matrix.label }}
+    runs-on: ${{ matrix.runner }}
+    env:
+      HAS_MACOS_CERT: ${{ secrets.MACOS_CERTIFICATE != '' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { label: Intel, runner: macos-13 }
+          - { label: AppleSilicon, runner: macos-14 }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install libmpv
+        run: brew install mpv
+      - name: Import signing certificate (optional)
+        if: env.HAS_MACOS_CERT == 'true'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          NOTARY_APPLE_ID: ${{ secrets.NOTARY_APPLE_ID }}
+          NOTARY_TEAM_ID: ${{ secrets.NOTARY_TEAM_ID }}
+          NOTARY_PASSWORD: ${{ secrets.NOTARY_PASSWORD }}
+          SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+        run: |
+          echo "$MACOS_CERTIFICATE" | base64 --decode > cert.p12
+          security create-keychain -p ci build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p ci build.keychain
+          security import cert.p12 -k build.keychain -P "$MACOS_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k ci build.keychain
+          xcrun notarytool store-credentials pulsedeck --apple-id "$NOTARY_APPLE_ID" --team-id "$NOTARY_TEAM_ID" \
+            --password "$NOTARY_PASSWORD"
+          echo "PULSEDECK_CODESIGN_IDENTITY=$SIGNING_IDENTITY" >> "$GITHUB_ENV"
+          echo "PULSEDECK_NOTARY_PROFILE=pulsedeck" >> "$GITHUB_ENV"
+      - name: Build
+        run: |
+          pip install -e ".[build,macos]"
+          python scripts/build_macos.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos-${{ matrix.label }}
+          path: dist/PulseDeck-macOS-*.dmg
+
+  linux:
+    name: Linux ${{ matrix.arch }}
+    runs-on: ${{ matrix.runner }}
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: x86_64, runner: ubuntu-22.04, experimental: false }
+          - { arch: aarch64, runner: ubuntu-22.04-arm, experimental: true }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libmpv-dev rpm libfuse2 libegl1 libxkbcommon-x11-0 libxcb-cursor0 \
+            libxcb-icccm4 libxcb-keysyms1 libxcb-shape0 file
+          curl -fsSL -o appimagetool \
+            "https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-${{ matrix.arch }}.AppImage"
+          chmod +x appimagetool
+          echo "APPIMAGETOOL=$PWD/appimagetool" >> "$GITHUB_ENV"
+      - name: Build
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          pip install -e ".[build]"
+          python scripts/build_linux.py --formats appimage,deb,rpm
+      - name: Test the .deb installs and launches
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          sudo apt-get install -y ./dist/pulsedeck_*.deb
+          pulsedeck --self-test
+          sudo apt-get remove -y pulsedeck
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.arch }}
+          path: |
+            dist/*.AppImage
+            dist/*.deb
+            dist/*.rpm
+
+  publish:
+    needs: [windows, macos, linux]
+    if: always() && startsWith(github.ref, 'refs/tags/v') && needs.macos.result == 'success'
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Release notes from CHANGELOG
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '$0 ~ "^## \\[?"v {flag=1; next} /^## / {flag=0} flag' CHANGELOG.md > notes.md
+          [ -s notes.md ] || echo "PulseDeck $version" > notes.md
+          (cd artifacts && find . -type f \( -name '*.exe' -o -name '*.dmg' -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \) \
+            -exec sha256sum {} \; | sed 's#\./[^/]*/##') > SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: notes.md
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.AppImage
+            artifacts/**/*.deb
+            artifacts/**/*.rpm
+            SHA256SUMS.txt

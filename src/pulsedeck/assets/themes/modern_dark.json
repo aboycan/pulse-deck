@@ -1,0 +1,26 @@
+{
+  "format": "pulsedeck-theme",
+  "version": 1,
+  "id": "modern_dark",
+  "name": "Modern Dark",
+  "radius": 8,
+  "colors": {
+    "window": "#1e1f24",
+    "panel": "#26272e",
+    "base": "#1a1b20",
+    "alt_base": "#202128",
+    "text": "#ececf1",
+    "muted": "#9a9ba6",
+    "accent": "#7c8cff",
+    "accent_text": "#0d0f1f",
+    "border": "#34353d",
+    "highlight": "#373c66",
+    "display_bg": "#24252c",
+    "display_text": "#ececf1",
+    "display_dim": "#8d8f9c",
+    "groove": "#3a3b44",
+    "danger": "#ff6b6b",
+    "button": "#2e2f37",
+    "button_hover": "#393a44"
+  }
+}

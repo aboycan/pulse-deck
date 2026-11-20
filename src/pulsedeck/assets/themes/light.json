@@ -1,0 +1,26 @@
+{
+  "format": "pulsedeck-theme",
+  "version": 1,
+  "id": "light",
+  "name": "Light",
+  "radius": 6,
+  "colors": {
+    "window": "#f3f4f7",
+    "panel": "#ffffff",
+    "base": "#ffffff",
+    "alt_base": "#f6f7fa",
+    "text": "#1d2129",
+    "muted": "#68707f",
+    "accent": "#1e78d6",
+    "accent_text": "#ffffff",
+    "border": "#d3d7df",
+    "highlight": "#d6e6fa",
+    "display_bg": "#e8edf4",
+    "display_text": "#14304f",
+    "display_dim": "#6a7f99",
+    "groove": "#cfd4dc",
+    "danger": "#c62828",
+    "button": "#eceef2",
+    "button_hover": "#e1e4ea"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "format": "pulsedeck-theme",
+  "version": 1,
+  "id": "high_contrast",
+  "name": "High Contrast",
+  "radius": 0,
+  "colors": {
+    "window": "#000000",
+    "panel": "#000000",
+    "base": "#000000",
+    "alt_base": "#0a0a0a",
+    "text": "#ffffff",
+    "muted": "#e0e0e0",
+    "accent": "#ffd400",
+    "accent_text": "#000000",
+    "border": "#ffffff",
+    "highlight": "#1a3cff",
+    "display_bg": "#000000",
+    "display_text": "#ffff00",
+    "display_dim": "#ffffff",
+    "groove": "#ffffff",
+    "danger": "#ff4040",
+    "button": "#000000",
+    "button_hover": "#1a1a1a"
+  }
+}

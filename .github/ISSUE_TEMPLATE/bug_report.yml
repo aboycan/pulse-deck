@@ -1,0 +1,46 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Please don't attach copyrighted music files.
+  - type: input
+    id: version
+    attributes:
+      label: PulseDeck version
+      description: Help > About
+      placeholder: "0.1.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [Windows 11, Windows 10, macOS (Apple Silicon), macOS (Intel), Linux - Ubuntu/Debian, Linux - Fedora, Linux - other]
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How did you install PulseDeck?
+      options: [Windows installer, DMG, AppImage, .deb, .rpm, From source]
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open a FLAC file\n2. Move the 62 Hz slider\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt
+      description: Help > Open Log Folder, then copy the last lines of pulsedeck.log
+      render: text
