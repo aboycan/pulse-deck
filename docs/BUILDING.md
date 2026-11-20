@@ -1,5 +1,9 @@
 # Building PulseDeck installers
 
+> **Status:** these scripts and the release workflow haven't been run yet,
+> and no installer has been built or tested. Expect some fixes on the first
+> run. PulseDeck is currently installed from source; see the README.
+
 Installers are built **on the platform they target** (PyInstaller cannot
 cross-compile). The GitHub Actions release workflow does this on native
 runners; this page explains how to do the same by hand.

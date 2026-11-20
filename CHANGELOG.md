@@ -44,7 +44,8 @@ All notable changes to PulseDeck are documented here. The format follows
 
 ## [0.1.0] - 2026-11-20
 
-First public release.
+First public release, **source only**: install with `install.py` (Windows, tested) or `install.sh`
+(macOS/Linux, not yet tested). No packaged installers have been built or released yet.
 
 ### Added
 - libmpv-based playback engine: MP3, FLAC, WAV, AAC/M4A, Ogg, Opus, WMA, AIFF; gapless playback,
@@ -60,5 +61,6 @@ First public release.
 - Context menus for songs, playlists, albums and artists.
 - Four original themes, custom accent colour, font size, compact mode, always on top, user theme files.
 - System tray, notifications, global media keys, single instance, file associations.
-- Installers: Windows (Inno Setup), macOS (DMG, Intel and Apple Silicon), Linux (AppImage, DEB, RPM).
-- GitHub Actions CI on Windows, macOS and Linux; tagged releases publish all installers.
+- Build scripts and a GitHub Actions release workflow for future installers: Windows (Inno Setup), macOS (DMG,
+  Intel and Apple Silicon), Linux (AppImage, DEB, RPM). They haven't been run or tested yet.
+- GitHub Actions CI that runs the tests on Windows, macOS and Linux.

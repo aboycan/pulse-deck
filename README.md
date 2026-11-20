@@ -52,8 +52,9 @@ regenerates them and uploads them as the `screenshots` artifact.*
 - **Right-click menus** for songs, playlists, albums and artists.
 - **Desktop integration:** system tray or menu bar icon, track-change
   notifications, system-wide media keys (Windows, Linux MPRIS, and macOS
-  with pyobjc), drag and drop, file associations, single instance,
-  always on top and a compact mode.
+  with pyobjc), drag and drop, single instance, always on top and a
+  compact mode. File associations ("Open with PulseDeck") will come with
+  the planned installers.
 - **Themes:** Classic Dark, Modern Dark, Light and High Contrast. You can
   set a custom accent colour and font size, or add your own themes as JSON
   files (see [docs/THEMES.md](docs/THEMES.md)).
@@ -61,33 +62,19 @@ regenerates them and uploads them as the `screenshots` artifact.*
 
 ## Install
 
-Download the installer for your system from the
-[Releases page](https://github.com/aboycan/pulse-deck/releases). You
-don't need to install Python, FFmpeg or mpv separately.
+PulseDeck is currently installed **from source** with a one-step setup
+script. Ready-made installers (`.exe`, `.dmg`, `.AppImage`, `.deb`,
+`.rpm`) are planned but **haven't been built or released yet**. See
+[Packaged installers (planned)](#packaged-installers-planned).
 
-| System | File | Notes |
+| Platform | How to install | Status |
 |---|---|---|
-| Windows 10 / 11 (64-bit) | `PulseDeck-Setup-x64.exe` | Start Menu shortcut, optional desktop icon and file associations. Uninstall from *Settings > Apps*. |
-| Windows on ARM | `PulseDeck-Setup-ARM64.exe` | Experimental. Only published when that build succeeds. |
-| macOS (Apple Silicon) | `PulseDeck-macOS-AppleSilicon.dmg` | Open the DMG and drag PulseDeck to Applications. |
-| macOS (Intel) | `PulseDeck-macOS-Intel.dmg` | Same as above. |
-| Linux (any distribution) | `PulseDeck-x86_64.AppImage` | `chmod +x` the file, then run it. |
-| Debian / Ubuntu | `pulsedeck_<version>_amd64.deb` | `sudo apt install ./pulsedeck_*.deb` |
-| Fedora / openSUSE | `pulsedeck-<version>-1.x86_64.rpm` | `sudo dnf install ./pulsedeck-*.rpm` |
+| Windows 10 / 11 | `install.py`, see [Running from source](#running-from-source-one-step-setup) | Tested |
+| macOS | `./install.sh` | Written; not yet tested on a Mac |
+| Linux | `./install.sh` | Written; not yet tested on a Linux desktop |
 
-**Unsigned macOS builds:** the first time you open PulseDeck, right-click
-it and choose *Open*. Builds are signed and notarized when the maintainers
-add Apple Developer credentials to the release workflow.
-
-### Uninstalling
-
-| System | Steps |
-|---|---|
-| Windows | Use *Settings > Apps*. The uninstaller asks whether to delete your settings too. |
-| macOS | Drag `PulseDeck.app` to the Bin. Your data is in `~/Library/Application Support/PulseDeck` if you want to remove it. |
-| Linux | Run `sudo apt remove pulsedeck` or `sudo dnf remove pulsedeck`, or delete the AppImage. Your data is in `~/.config/pulsedeck` and `~/.local/share/pulsedeck`. |
-
-Upgrading keeps your playlists, library and settings.
+You need Python 3.11 or newer. On Windows the setup offers to install it
+for you.
 
 ## Keyboard shortcuts
 
@@ -178,12 +165,24 @@ Run the tests with `pytest` (set up with `install.py --dev` or
 Qt platform; they are skipped when those aren't available. CI runs the full
 suite on Windows, macOS and Linux.
 
-## Building installers
+## Packaged installers (planned)
 
-See [docs/BUILDING.md](docs/BUILDING.md). In short, on each platform run
-`python scripts/build_windows.py`, `python scripts/build_macos.py` or
-`python scripts/build_linux.py`. Pushing a `v*` tag makes GitHub Actions
-build every installer on native runners and publish a release.
+The repository contains the build scripts and a GitHub Actions release
+workflow for standalone installers that won't need Python. None of these
+have been built, run or tested yet, and there's no release to download.
+
+| Platform | Planned file | Status |
+|---|---|---|
+| Windows 10 / 11 (64-bit) | `PulseDeck-Setup-x64.exe` (Inno Setup) | Not yet built |
+| Windows on ARM | `PulseDeck-Setup-ARM64.exe` | Not yet built (experimental) |
+| macOS Apple Silicon / Intel | `PulseDeck-macOS-AppleSilicon.dmg` / `PulseDeck-macOS-Intel.dmg` | Not yet built; unsigned until Apple Developer credentials are added |
+| Linux | `PulseDeck-x86_64.AppImage`, `.deb`, `.rpm` | Not yet built |
+
+To try building them, see [docs/BUILDING.md](docs/BUILDING.md). You can
+run `python scripts/build_windows.py` (or the `build_macos.py` /
+`build_linux.py` equivalents) on each platform, or push a `v*` tag so
+GitHub Actions builds them on native runners. Once an installer has
+actually been built and tested, this section will move to **Install**.
 
 ## Documentation
 
