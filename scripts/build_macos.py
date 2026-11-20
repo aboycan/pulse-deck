@@ -2,8 +2,18 @@
 # Copyright (c) 2026 Madhu Kumar and PulseDeck contributors
 """Build the macOS .app bundle and drag-and-drop DMG.
 
-Usage (on macOS, from the repository root):
-    python scripts/build_macos.py
+Usage (on macOS, from the repository root, after `bash install.sh`):
+    .venv/bin/pip install -e ".[build,macos]"
+    .venv/bin/python scripts/build_macos.py
+
+The result is dist/PulseDeck-macOS-<AppleSilicon|Intel>.dmg containing a
+self-contained PulseDeck.app (Python, Qt, libmpv/FFmpeg and every library
+they need), so the Mac it runs on needs no Python or Homebrew.
+
+A DMG built on your own Mac carries no "downloaded from the internet"
+quarantine flag, so it installs and opens there without any Gatekeeper
+prompt. Copies downloaded by other people are unsigned: they approve the
+app once in System Settings > Privacy & Security > Open Anyway.
 
 Build on an Intel Mac (or Intel runner) for PulseDeck-macOS-Intel.dmg and on
 an Apple Silicon Mac for PulseDeck-macOS-AppleSilicon.dmg. libmpv is taken
@@ -17,8 +27,10 @@ Optional signing / notarization (all must be set to sign):
 from __future__ import annotations
 
 import os
+import platform
 import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -32,6 +44,78 @@ def brew_libmpv() -> list[Path]:
         return []
     lib = Path(prefix) / "lib"
     return [lib / "libmpv.2.dylib", lib / "libmpv.dylib"]
+
+
+#: Library locations that exist only on the build Mac (Homebrew, MacPorts, local installs).
+EXTERNAL_PREFIXES = ("/opt/homebrew/", "/usr/local/", "/opt/local/")
+
+
+def check_environment() -> None:
+    """Fail early, with a clear message, if the build tools aren't installed in this Python."""
+    missing = []
+    for module, package in (("PyInstaller", "pyinstaller"), ("PySide6", "PySide6-Essentials"),
+                            ("mutagen", "mutagen"), ("mpv", "python-mpv")):
+        try:
+            __import__(module)
+        except Exception:
+            missing.append(package)
+    if missing:
+        raise SystemExit(
+            f"Missing in this Python ({sys.executable}): {', '.join(missing)}\n"
+            "Run from the repository root:\n"
+            "  bash install.sh\n"
+            '  .venv/bin/pip install -e ".[build,macos]"\n'
+            "  .venv/bin/python scripts/build_macos.py"
+        )
+
+
+def deployment_target() -> str:
+    """Oldest macOS the app claims to support.
+
+    Homebrew's libraries are built for the Mac they were installed on, so the
+    app can't honestly promise more than the build Mac's own macOS version.
+    """
+    if os.environ.get("MACOSX_DEPLOYMENT_TARGET"):
+        return os.environ["MACOSX_DEPLOYMENT_TARGET"]
+    release = platform.mac_ver()[0] or "11.0"
+    major = release.split(".")[0]
+    return f"{major}.0"
+
+
+def mach_o_files(app: Path) -> list[Path]:
+    files = []
+    for path in app.rglob("*"):
+        if path.is_file() and not path.is_symlink():
+            with open(path, "rb") as handle:
+                magic = handle.read(4)
+            if magic in (b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca"):
+                files.append(path)
+    return files
+
+
+def external_references(otool_output: str) -> list[str]:
+    """Library paths from ``otool -L`` output that point outside the app and outside macOS itself."""
+    refs = []
+    for line in otool_output.splitlines()[1:]:
+        lib = line.strip().split(" (compatibility", 1)[0].strip()
+        if lib.startswith(EXTERNAL_PREFIXES):
+            refs.append(lib)
+    return refs
+
+
+def verify_self_contained(app: Path) -> None:
+    """Make sure the app loads nothing from Homebrew, so it works on Macs without it."""
+    problems = []
+    binaries = mach_o_files(app)
+    for binary in binaries:
+        out = subprocess.run(["otool", "-L", str(binary)], capture_output=True, text=True).stdout
+        for ref in external_references(out):
+            problems.append(f"{binary.relative_to(app)} -> {ref}")
+    if problems:
+        listing = "\n  ".join(problems[:25])
+        more = f"\n  ... and {len(problems) - 25} more" if len(problems) > 25 else ""
+        raise SystemExit(f"The app still depends on libraries outside the bundle:\n  {listing}{more}")
+    print(f"Self-contained: {len(binaries)} binaries checked, no Homebrew or /usr/local dependencies.")
 
 
 def make_dmg(app: Path, output: Path) -> None:
@@ -67,10 +151,14 @@ def sign_and_notarize(app: Path, dmg: Path) -> None:
 
 
 def main() -> None:
+    check_environment()
     libmpv = require_libmpv(brew_libmpv())
     arch = machine()
-    pyinstaller(libmpv, {"PULSEDECK_ARCH": arch})
+    target = deployment_target()
+    print(f"Building PulseDeck {version()} for {arch}, macOS {target} or later")
+    pyinstaller(libmpv, {"PULSEDECK_ARCH": arch, "MACOSX_DEPLOYMENT_TARGET": target})
     app = DIST / "PulseDeck.app"
+    verify_self_contained(app)
     smoke_test(app / "Contents" / "MacOS" / "PulseDeck")
     dmg = DIST / artifact_name("macos", arch)
     sign_and_notarize(app, dmg)

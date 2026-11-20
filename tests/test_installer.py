@@ -222,3 +222,32 @@ def test_licence_texts_fall_back_to_spdx_and_check_versions(tmp_path, monkeypatc
     assert "LGPL-2.1.txt" not in sources                       # no source available -> reported missing
     assert (tmp_path / "GPL-3.0.txt").read_bytes() == GPL3
     assert not cl.valid_text("GPL-2.0.txt", GPL3)
+
+
+OTOOL_SAMPLE = """/x/PulseDeck.app/Contents/Frameworks/libmpv.2.dylib:
+\t@rpath/libmpv.2.dylib (compatibility version 2.0.0, current version 2.5.0)
+\t@loader_path/libavcodec.62.dylib (compatibility version 62.0.0, current version 62.11.100)
+\t/opt/homebrew/opt/libass/lib/libass.9.dylib (compatibility version 10.0.0, current version 10.0.0)
+\t/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1351.0.0)
+\t/System/Library/Frameworks/CoreAudio.framework/Versions/A/CoreAudio (compatibility version 1.0.0)
+\t/usr/local/lib/libfoo.dylib (compatibility version 1.0.0, current version 1.0.0)
+"""
+
+
+def test_macos_build_flags_homebrew_dependencies():
+    import build_macos
+
+    refs = build_macos.external_references(OTOOL_SAMPLE)
+    assert refs == ["/opt/homebrew/opt/libass/lib/libass.9.dylib", "/usr/local/lib/libfoo.dylib"]
+    clean = "\n".join(line for line in OTOOL_SAMPLE.splitlines() if "homebrew" not in line and "/usr/local" not in line)
+    assert build_macos.external_references(clean) == []     # @rpath, /usr/lib and /System are fine
+
+
+def test_macos_deployment_target(monkeypatch):
+    import build_macos
+
+    monkeypatch.delenv("MACOSX_DEPLOYMENT_TARGET", raising=False)
+    monkeypatch.setattr(build_macos.platform, "mac_ver", lambda: ("15.3.1", ("", "", ""), "arm64"))
+    assert build_macos.deployment_target() == "15.0"
+    monkeypatch.setenv("MACOSX_DEPLOYMENT_TARGET", "13.0")
+    assert build_macos.deployment_target() == "13.0"

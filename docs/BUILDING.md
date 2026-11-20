@@ -61,7 +61,7 @@ uninstall unless the user explicitly chooses to delete it.
 
 **Minimum macOS version.** Homebrew bottles target the macOS version they were
 built for, so the app requires at least the build machine's macOS (the CI uses
-macOS 13 for Intel and macOS 14 for Apple Silicon). For wider compatibility,
+macOS 15 for both Intel and Apple Silicon). For wider compatibility,
 build libmpv yourself with `MACOSX_DEPLOYMENT_TARGET` set and pass it with
 `PULSEDECK_LIBMPV`.
 
@@ -108,8 +108,8 @@ package manager.
 |---|---|---|
 | Windows x64 | `windows-latest` | `PulseDeck-Setup-x64.exe` |
 | Windows ARM64 (experimental) | `windows-11-arm` | `PulseDeck-Setup-ARM64.exe` |
-| macOS Intel | `macos-13` | `PulseDeck-macOS-Intel.dmg` |
-| macOS Apple Silicon | `macos-14` | `PulseDeck-macOS-AppleSilicon.dmg` |
+| macOS Intel | `macos-15-intel` | `PulseDeck-macOS-Intel.dmg` |
+| macOS Apple Silicon | `macos-15` | `PulseDeck-macOS-AppleSilicon.dmg` |
 | Linux x86_64 | `ubuntu-22.04` | AppImage, DEB, RPM (the DEB is installed and self-tested) |
 | Linux ARM64 (experimental) | `ubuntu-22.04-arm` | AppImage, DEB, RPM |
 
